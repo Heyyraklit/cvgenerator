@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CV Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+    
+  :root {
+  --bg: #ffffff;
+  --text: #000000;
+  --card-bg: #ffffff;
+  --badge-bg: #eaf3ff;
+  --badge-text: #000000;
+  --border: #00000020;
+}
+
+.dark {
+  --bg: #1e1e1e;
+  --text: #000000;
+  --card-bg: #2a2a2a;
+  --badge-bg: #333333;
+  --badge-text: #000000;
+  --border: #ffffff30;
+}
+
+  .theme-default {
+    --primary: #111;
+    --bg: #ffffff;
+    --text: #111;
+    --card: #ffffff;
+}
+  /* theme vars will be toggled by body class */
+  body{font-family:"Poppins",sans-serif;background:var(--bg);color:var(--text);margin:0;padding:18px; -webkit-font-smoothing:antialiased;}
+  .container{max-width:1100px;margin:0 auto;display:flex;gap:18px;flex-wrap:wrap}
+  .panel{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(10,15,30,0.06);flex:1;min-width:300px}
+  h1{margin:0 0 12px 0;color:var(--primary)}
+  label{display:block;font-weight:600;font-size:13px;margin-top:8px}
+  input,textarea,select,button{font-family:inherit}
+  input,textarea,select{width:100%;padding:8px;margin-top:6px;border:1px solid #d7dbe0;border-radius:8px;background:#fff;font-size:14px}
+  textarea{min-height:72px;resize:vertical}
+  .row{display:flex;gap:12px}
+  .row .col{flex:1}
+  .muted{color:#6b7280;font-size:13px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  button.primary{background:var(--primary);color: #e6dfdf !important;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+  body.theme-dark .primary {background: #000 !important;color: #ffffff !important;border: 1px solid #333 !important;}
+  button.ghost{background:#6b7280;color:#ffffff;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+  button.warn{background:#d1d5db;color:#111;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+
+  /* preview */
+  /* =======================================
+   FIX: Card CV mengikuti Theme sepenuhnya
+   ======================================= */
+/* ================================
+   DARK MODE → FULL A4 DARK
+   ================================ */
+body.theme-dark #cvPreview {
+    width: 210mm !important;
+    min-height: 230mm !important;
+    background: #000 !important;
+    color: #fff !important;
+    padding: 20mm !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Semua elemen ikut dark mode tanpa kecuali */
+body.theme-dark #cvPreview * {
+    background: transparent !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+
+/* Badge dark */
+body.theme-dark .skill-pill,
+body.theme-dark .cv-skill-badge,
+body.theme-dark .cv-exp-badge,
+body.theme-dark .cv-edu-badge {
+    background: #111 !important;
+    color: #fff !important;
+    border: 1px solid #444 !important;
+}
+
+/* Border foto tetap kontras */
+body.theme-dark .cv-photo {
+    border-color: #fff !important;
+}
+
+   .cv-light {
+    --cv-bg: var(--card);
+    --cv-text: #111;
+}
+
+/* Mode gelap */
+.cv-dark {
+    --cv-bg: #1d1d1d;
+    --cv-text: #000000;
+}
+#cvPreview {
+    background: var(--card) !important;
+    padding: 25px;
+    border-radius: 12px;
+    color: var(--text) !important;
+}
+
+#cvPreview * {
+    color: var(--text) !important;
+}
+
+#cvPreview h3 {
+    border-bottom: 2px solid var(--primary) !important;
+    color: var(--primary) !important;
+}
+
+#cvPreview h2 {
+    color: var(--primary) !important;
+}
+
+#cvPreview ul li::marker {
+    color: var(--primary);
+}
+
+.cv-photo {
+    border: 3px solid var(--primary) !important;
+}
+
+.cv-skill-badge,
+.cv-exp-badge,
+.cv-edu-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 6px 6px 0 0;
+  border-radius: 25px;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
+  #cvPreview{min-height:320px;padding:18px;border-radius:8px}
+  .cv-inner{max-width:780px;margin:0 auto}
+  .cv-photo{width:120px;height:120px;border-radius:50%;overflow:hidden;border:3px solid var(--primary);margin:0 auto 10px}
+  .cv-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .cv-head{text-align:center;margin-bottom:10px}
+  .cv-head h2{margin:6px 0 2px 0}
+  .cv-head p{margin:0;color:var(--muted, #556);font-size:14px}
+  .cv-section{margin-top:12px}
+
+  .cv-section h3{margin:0 0 10px 0;color:var(--primary);font-size:15px;border-bottom:1px solid #eef2f6;padding-bottom:6px}
+  ul.skill-list{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
+  .skill-pill{background:#eef6ff;border-radius:999px;padding:6px 10px;font-weight:600;border:1px solid rgba(11,37,69,0.06);font-size:13px}
+
+  .theme-dark .skill-pill {
+  background: #1f2937 !important;   /* abu gelap */
+  color: #e5e7eb !important;         /* putih keabu-abuan */
+  border: 1px solid #4b5563 !important; 
+}
+
+/* Skill badge ikut BLUE theme */
+body.theme-blue .skill-pill {
+  background: #e8f0ff !important;
+  color: #062241 !important;
+  border: 1px solid #8bb3ff !important;
+}
+
+/* Skill badge ikut GREEN theme */
+body.theme-green .skill-pill {
+  background: #e8fff1 !important;
+  color: #06421a !important;
+  border: 1px solid #4ad37b !important;
+}
+
+/* Skill badge ikut RED theme */
+body.theme-red .skill-pill {
+  background: #ffe8e8 !important;
+  color: #3b0d0d !important;
+  border: 1px solid #ff7a7a !important;
+}
+
+  .entry{margin-bottom:8px}
+  .small{font-size:13px;color:#555}
+
+  /* modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
+  .modal{background:var(--card);border-radius:10px;padding:16px;max-width:520px;width:100%;box-shadow:0 10px 40px rgba(2,6,23,0.4)}
+  .modal h4{margin:0 0 10px 0}
+  .modal .row{flex-direction:column}
+  .modal .close{background:#ef4444;color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+
+  /* theme variants */
+  body.theme-dark{ --primary:#e9e6e6; --accent:#000000; --bg:#0f1724; --card:#1c1e1f; --text:#ffff }
+  body.theme-blue{ --primary:#0a4fff; --accent:#2b7cff; --bg:#eaf0ff; --card:#ffffff; --text:#062241 }
+  body.theme-green{ --primary:#0ea64b; --accent:#2ad079; --bg:#eafff2; --card:#ffffff; --text:#062241 }
+  body.theme-red{ --primary:#ff2e2e; --accent:#ff7a7a; --bg:#fff0f0; --card:#ffffff; --text:#062241 }
+
+  /* responsive */
+  @media (max-width:880px){ .container{padding:10px} .panel{min-width:100%} }
+
+  /* fade scroll */
+  .fade-scroll{opacity:0;transform:translateY(20px);transition:0.7s ease}
+  .visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body class="theme-default">
+
+
+<div class="container">
+
+  <!-- LEFT: controls -->
+  <div class="panel" style="max-width:420px">
+
+    <h1>CV Generator</h1>
+    <div class="muted">Isi data dan unduh CV.</div>
+
+    <label>Pilih Tema</label>
+    <select id="themeSelect">
+      <option value="theme-default">Putih</option>
+      <option value="theme-dark">Dark</option>
+      <option value="theme-blue">Blue</option>
+      <option value="theme-green">Green</option>
+      <option value="theme-red">Red</option>
+    </select>
+
+    <label style="margin-top:12px">Foto Profil</label>
+    <input type="file" id="foto" accept="image/*">
+
+    <label>Nama Lengkap</label>
+    <input id="nama" placeholder="Nama lengkap">
+
+    <label>Posisi / Jabatan</label>
+    <input id="jabatan" placeholder="Contoh: Frontend Developer">
+
+    <label>Email</label>
+    <input id="email" placeholder="email@example.com">
+
+    <label>Telepon</label>
+    <input id="telepon" placeholder="08xx...">
+
+    <label>Profil Singkat (maks 50 kata)</label>
+    <textarea id="profil" placeholder="Ringkasan singkat"></textarea>
+    <div id="wordCounter" class="small" style="text-align:right">0/50 kata</div>
+
+    <hr style="margin:12px 0">
+
+    <!-- Add buttons for B-modals -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="primary" onclick="openModal('skill')">+ Tambah Keahlian</button>
+      <button class="primary" onclick="openModal('exp')">+ Tambah Pengalaman</button>
+      <button class="primary" onclick="openModal('edu')">+ Tambah Pendidikan</button>
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="generatePreview()">Tampilkan CV</button>
+      <button class="primary" onclick="downloadPDF()">Download PDF</button>
+      <button class="ghost" onclick="resetAll()">Reset Form</button>
+    </div>
+
+    <div style="margin-top:12px;color:#6b7280;font-size:13px"></div>
+  </div>
+
+  <!-- RIGHT: preview -->
+  <div class="panel" id="cvPanel">
+    <h2 style="margin-top:0">Preview CV</h2>
+    <div id="cvPreview">
+      <div class="cv-inner" style="text-align:center;color:#6b7280;padding:30px 0"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal backdrops -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <!-- Modal content will be injected dynamically -->
+</div>
+
+<!-- Templates for modal markup (we will clone) -->
+<template id="modal-skill">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h4>Tambah Keahlian</h4>
+    <div class="row">
+      <label>Nama Keahlian</label>
+      <input id="m_skill_name" placeholder="Contoh: JavaScript">
+      <label>Level</label>
+      <select id="m_skill_level">
+        <option>Beginner</option>
+        <option>Intermediate</option>
+        <option>Advanced</option>
+        <option>Expert</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="close" onclick="closeModal()">Batal</button>
+      <button class="primary" onclick="saveSkill()">Tambah</button>
+    </div>
+  </div>
+</template>
+
+<template id="modal-exp">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h4>Tambah Pengalaman Kerja</h4>
+    <div class="row">
+      <label>Perusahaan</label>
+      <input id="m_exp_company" placeholder="Nama Perusahaan">
+      <label>Posisi</label>
+      <input id="m_exp_role" placeholder="Posisi / Jabatan">
+      <label>Tahun (contoh: 2021–2024)</label>
+      <input id="m_exp_year" placeholder="2021–2024">
+      <label>Deskripsi Tugas</label>
+      <textarea id="m_exp_desc" placeholder="Ringkasan tugas dan pencapaian"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="close" onclick="closeModal()">Batal</button>
+      <button class="primary" onclick="saveExperience()">Tambah</button>
+    </div>
+  </div>
+</template>
+
+<template id="modal-edu">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h4>Tambah Pendidikan</h4>
+    <div class="row">
+      <label>Institusi</label>
+      <input id="m_edu_school" placeholder="Nama Institusi">
+      <label>Jurusan / Gelar</label>
+      <input id="m_edu_major" placeholder="Contoh: S1 Informatika">
+      <label>Tahun (contoh: 2018–2022)</label>
+      <input id="m_edu_year" placeholder="2018–2022">
+      <label>Keterangan (opsional)</label>
+      <textarea id="m_edu_note" placeholder="IPK, prestasi, keterangan"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="close" onclick="closeModal()">Batal</button>
+      <button class="primary" onclick="saveEducation()">Tambah</button>
+    </div>
+  </div>
+</template>
+
+<!-- html2pdf -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+<script>    
+/* -------------------
+   State arrays
+   ------------------- */
+let skills = [];        // {name, level}
+let experiences = [];   // {company, role, year, desc}
+let educations = [];    // {school, major, year, note}
+let fotoBase64 = "";
+
+/* -------------------
+   Theme handling
+   ------------------- */
+const themeSelect = document.getElementById('themeSelect');
+themeSelect.addEventListener('change', ()=> applyTheme(themeSelect.value));
+function applyTheme(val){
+  // body classes: theme-dark / theme-blue / theme-green / theme-red
+  document.body.classList.remove('theme-dark','theme-blue','theme-green','theme-red');
+  if(!val) val = 'theme-dark';
+  document.body.classList.add(val);
+}
+// initial
+applyTheme(themeSelect.value || 'theme-dark');
+
+/* -------------------
+   Word counter for profil
+   ------------------- */
+const profilEl = document.getElementById('profil');
+const wordCounter = document.getElementById('wordCounter');
+profilEl.addEventListener('input', ()=>{
+  const count = countWords(profilEl.value);
+  wordCounter.textContent = `${count}/50 kata`;
+  if(count>50) wordCounter.style.color = '#e11d48'; else wordCounter.style.color = '#6b7280';
+});
+function countWords(s){ return s.trim()===''?0:s.trim().split(/\s+/).length; }
+
+/* -------------------
+   Foto upload
+   ------------------- */
+document.getElementById('foto').addEventListener('change', function(){
+  const f = this.files && this.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = (e)=> { fotoBase64 = e.target.result; }
+  reader.readAsDataURL(f);
+});
+
+
+/* -------------------
+   Modal controls
+   ------------------- */
+const modalBackdrop = document.getElementById('modalBackdrop');
+function openModal(type){
+  modalBackdrop.innerHTML = '';
+  let tplId = 'modal-' + type;
+  const tpl = document.getElementById(tplId);
+  if(!tpl) return;
+  const clone = tpl.content.cloneNode(true);
+  modalBackdrop.appendChild(clone);
+  modalBackdrop.style.display = 'flex';
+}
+function closeModal(){
+  modalBackdrop.style.display = 'none';
+  modalBackdrop.innerHTML = '';
+}
+
+function updateCVTheme() {
+    const cv = document.getElementById("previewCV");
+    if (!cv) return;
+
+    cv.style.background = getComputedStyle(document.body).getPropertyValue("--card-bg");
+    cv.style.color = getComputedStyle(document.body).getPropertyValue("--text");
+
+    // Update semua badge secara otomatis
+    cv.querySelectorAll(".cv-skill-badge, .cv-exp-badge, .cv-edu-badge").forEach(badge => {
+        badge.style.background = getComputedStyle(document.body).getPropertyValue("--badge-bg");
+        badge.style.color = getComputedStyle(document.body).getPropertyValue("--badge-text");
+        badge.style.borderColor = getComputedStyle(document.body).getPropertyValue("--border");
+    });
+}
+
+/* -------------------
+   Save functions for modals
+   ------------------- */
+function saveSkill(){
+  const name = document.getElementById('m_skill_name').value.trim();
+  const level = document.getElementById('m_skill_level').value;
+  if(!name){ alert('Masukkan nama keahlian'); return; }
+  skills.push({name, level});
+  closeModal();
+  renderPreview();
+}
+function saveExperience(){
+  const company = document.getElementById('m_exp_company').value.trim();
+  const role = document.getElementById('m_exp_role').value.trim();
+  const year = document.getElementById('m_exp_year').value.trim();
+  const desc = document.getElementById('m_exp_desc').value.trim();
+  if(!company || !role){ alert('Masukkan perusahaan dan posisi'); return; }
+  experiences.push({company, role, year, desc});
+  closeModal();
+  renderPreview();
+}
+function saveEducation(){
+  const school = document.getElementById('m_edu_school').value.trim();
+  const major = document.getElementById('m_edu_major').value.trim();
+  const year = document.getElementById('m_edu_year').value.trim();
+  const note = document.getElementById('m_edu_note').value.trim();
+  if(!school){ alert('Masukkan nama institusi'); return; }
+  educations.push({school, major, year, note});
+  closeModal();
+  renderPreview();
+}
+
+/* -------------------
+   Render preview (main)
+   ------------------- */
+function generatePreview(){
+  // enforce profil word limit
+  if(countWords(profilEl.value) > 50){ alert('Profil melebihi 50 kata. Tolong ringkas.'); return; }
+  renderPreview();
+}
+
+function renderPreview(){
+  const name = document.getElementById('nama').value.trim();
+  const job = document.getElementById('jabatan').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const tel = document.getElementById('telepon').value.trim();
+  const prof = document.getElementById('profil').value.trim();
+
+  const cv = document.getElementById('cvPreview');
+  // build sections
+ let skillsHTML = skills.length 
+  ? `<div style="display:flex; flex-direction:column; gap:8px;">` +
+      skills.map(s=>`<span class="skill-pill" style="width:max-content;">${escapeHtml(s.name)} — ${escapeHtml(s.level)}</span>`).join('') +
+    `</div>`
+  : '<p class="muted">Belum ada keahlian</p>';
+
+
+  let expHTML = experiences.length ? experiences.map(e=>`<div class="entry"><strong>${escapeHtml(e.role)}</strong> — ${escapeHtml(e.company)} ${e.year? '('+escapeHtml(e.year)+')' : ''}<div class="small">${escapeHtml(e.desc)}</div></div>`).join('') : '<p class="muted">Belum ada pengalaman</p>';
+  let eduHTML = educations.length ? educations.map(ed=>`<div class="entry"><strong>${escapeHtml(ed.school)}</strong> — ${escapeHtml(ed.major)} ${ed.year? '('+escapeHtml(ed.year)+')' : ''}<div class="small">${escapeHtml(ed.note)}</div></div>`).join('') : '<p class="muted">Belum ada pendidikan</p>';
+
+  cv.innerHTML = `
+    <div class="cv-inner">
+      <div class="cv-photo">${fotoBase64 ? `<img src="${fotoBase64}" alt="foto profil">` : ''}</div>
+      <div class="cv-head">
+        <h2>${escapeHtml(name || 'Nama Lengkap')}</h2>
+        <div class="small">${escapeHtml(job || '')}${(job && (email||tel))? ' • ' : ''}${escapeHtml(email || '')}${(email && tel)? ' • ' : ''}${escapeHtml(tel || '')}</div>
+      </div>
+
+      <div class="cv-section fade-scroll">
+        <h3>Profil</h3>
+        <p>${escapeHtml(prof) || '<span class="muted">Belum diisi</span>'}</p>
+      </div>
+
+      <div class="cv-section fade-scroll">
+        <h3>Keahlian</h3>
+        <div style="margin-top:8px">${skillsHTML}</div>
+      </div>
+
+      <div class="cv-section fade-scroll">
+        <h3>Pengalaman Kerja</h3>
+        <div style="margin-top:8px">${expHTML}</div>
+      </div>
+
+      <div class="cv-section fade-scroll">
+        <h3>Pendidikan</h3>
+        <div style="margin-top:8px">${eduHTML}</div>
+      </div>
+    </div>
+  `;
+
+  // trigger fade-in animation on sections
+  requestAnimationFrame(()=> {
+    document.querySelectorAll('.fade-scroll').forEach((el,i)=>{
+      setTimeout(()=> el.classList.add('visible'), i*80);
+    });
+  });
+}
+
+/* -------------------
+   Download to PDF
+   ------------------- */
+function downloadPDF(){
+  const cvElement = document.getElementById('cvPreview');
+
+  // If preview is empty, ask to generate
+  if(!cvElement.innerText || cvElement.innerText.includes('Isi form')) {
+    alert('Silakan buat CV terlebih dahulu sebelum mengunduh.');
+    return;
+  }
+
+  // html2pdf options - ensure single A4 page scaling
+  const opt = {
+    margin:       [0.4, 0.4], // top/bottom in inches
+    filename:     'CV anda.pdf',
+    image:        { type: 'jpeg', quality: 0.95 },
+    html2canvas:  { scale: 2, useCORS: true, allowTaint: true },
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+
+  // temporarily set white background for dark themes to look good on pdf
+  const prevBodyBg = document.body.style.backgroundColor;
+  document.body.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--bg');
+
+  html2pdf().set(opt).from(cvElement).save().finally(()=>{
+    document.body.style.backgroundColor = prevBodyBg || '';
+  });
+}
+
+/* -------------------
+   Reset form + state
+   ------------------- */
+function resetAll(){
+  if(!confirm('Reset semua data? Tindakan ini akan menghapus semua input dan preview.')) return;
+  // clear inputs
+  ['nama','jabatan','email','telepon','profil'].forEach(id=>document.getElementById(id).value = '');
+  document.getElementById('foto').value = '';
+  fotoBase64 = '';
+  // clear arrays
+  skills = []; experiences = []; educations = [];
+  // clear preview
+  document.getElementById('cvPreview').innerHTML = '<div class="cv-inner" style="text-align:center;color:#6b7280;padding:30px 0">Isi form lalu klik "Tampilkan CV"</div>';
+  // reset theme and word counter
+  themeSelect.value = 'theme-dark';
+  applyTheme('theme-dark');
+  wordCounter.textContent = '0/50 kata';
+}
+
+/* -------------------
+   Helpers
+   ------------------- */
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#39;');
+}
+
+/* -------------------
+   Click outside modal to close
+   ------------------- */
+modalBackdrop.addEventListener('click', (e)=>{
+  if(e.target === modalBackdrop) closeModal();
+});
+
+/* -------------------
+   Optional init: render empty preview
+   ------------------- */
+renderPreview();
+
+</script>
+
+</body>
+</html>
